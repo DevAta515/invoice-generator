@@ -1,26 +1,20 @@
-require('dotenv').config();
 const express = require("express");
+const session = require("express-session");
+const passport = require("./config/passport"); // Updated path to passport.js
+const authRoute = require("./routes/authRoute"); // Updated path to authRoute.js
+
 const app = express();
-const cors = require("cors")
-const PORT = 4000;
-const { connection } = require("./config/db");
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(cors());
+// Middleware to initialize Passport and session
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
-(async () => {
-    try {
-        await connection();
-        console.log("Database connected successfully");
+// Use the authentication routes
+app.use("/", authRoute);
 
-        app.get("/", (req, res) => {
-            res.send("API working");
-        });
-        app.listen(PORT, () => {
-            console.log(`Server started on http://localhost:${PORT}`);
-        });
-    } catch (error) {
-        console.error("Error connecting to the database:", error);
-        process.exit(1);
-    }
-})();
+// Start server
+app.listen(PORT, () => {
+    console.log("Server running on", PORT);
+});
