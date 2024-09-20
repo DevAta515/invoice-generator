@@ -10,7 +10,8 @@ const jwt = require("jsonwebtoken");
 
 // Home route
 router.get("/", (req, res) => {
-    res.send('<a href="/auth/google">Click here to login with Google</a>');
+    // res.send('<a href="/auth/google">Click here to login with Google</a>');
+    res.redirect("/auth/google");
 });
 
 // Google OAuth route
@@ -23,9 +24,14 @@ router.get("/auth/google/callback",
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
         const user = req.user;
+        req.session.token = user.token;
+        req.session.userInfo = {
+            id: user.user._id,
+            name: user.user.name,
+            email: user.user.email
+        };
         if (user && user.token) {
-            console.log(res)
-            res.redirect(`/protected`);
+            res.redirect(`http://localhost:5173`);
         } else {
             res.redirect('/');
         }
@@ -56,6 +62,7 @@ router.post('/signup', async (req, res) => {
         await user.save();
         const userId = user.email;
         const token = jwt.sign({ userId }, process.env.JWT_SECRET);
+        req.session.token = token;
         res.status(200).json({ success: true, message: 'User created successfully.', token });
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
@@ -84,11 +91,18 @@ router.post('/login', async (req, res, next) => {
         req.login(user, (err) => {
             if (err) return next(err);
             const token = jwt.sign({ email }, process.env.JWT_SECRET);
+            req.session.token = token;
             res.status(200).json({ success: true, message: 'Logged in successfully.', token });
         });
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
     }
 });
+
+router.get("/getToken", (req, res) => {
+    return res.status(200).json({
+        success: true, token: req.session.token
+    })
+})
 
 module.exports = router;
