@@ -26,12 +26,14 @@ const SignUp = () => {
                 const response = await axios.post("http://localhost:3000/login", body);
                 if (response.data.success) {
                     localStorage.setItem("token", response.data.token);
+                    navigate("/option");
                 }
             } else {
                 const body = { name, email, password };
                 const response = await axios.post("http://localhost:3000/signup", body);
                 if (response.data.success) {
                     localStorage.setItem("token", response.data.token);
+                    navigate("/option");
                 }
             }
             resetForm();
