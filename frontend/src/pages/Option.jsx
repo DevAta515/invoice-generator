@@ -22,7 +22,11 @@ const Option = () => {
                         console.log('Did not get the token');
                     }
                 } else {
-                    navigate("/");
+                    if (localStorage.getItem("token")) {
+                        navigate("/option")
+                    } else {
+                        navigate("/");
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching token:', error);
@@ -44,7 +48,9 @@ const Option = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
                     <div className="bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out transform hover:scale-105 cursor-pointer">
                         <div className="p-6 flex flex-col items-center">
-                            <div className="w-16 h-16 bg-green-200 text-green-700 rounded-full flex items-center justify-center mb-4">
+                            <div className="w-16 h-16 bg-green-200 text-green-700 rounded-full flex items-center justify-center mb-4"
+                                onClick={() => navigate("/create")}
+                            >
                                 <FaRegFileAlt className="w-10 h-10 hover:scale-110 transition-transform duration-300 ease-in-out" />
                             </div>
                             <h2 className="text-2xl font-semibold text-gray-700 mb-4">
@@ -58,7 +64,9 @@ const Option = () => {
 
                     <div className="bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out transform hover:scale-105 cursor-pointer">
                         <div className="p-6 flex flex-col items-center">
-                            <div className="w-16 h-16 bg-blue-200 text-blue-700 rounded-full flex items-center justify-center mb-4">
+                            <div className="w-16 h-16 bg-blue-200 text-blue-700 rounded-full flex items-center justify-center mb-4"
+                                onClick={() => navigate("/edit")}
+                            >
                                 <FaPencilAlt className="w-10 h-10 hover:scale-110 transition-transform duration-300 ease-in-out" />
                             </div>
                             <h2 className="text-2xl font-semibold text-gray-700 mb-4">

@@ -26,7 +26,7 @@ router.post('/add', async (req, res) => {
 
         if (client) {
             return res.status(400).json({
-                success: false,
+                success: true,
                 message: "Client already exists"
             });
         }

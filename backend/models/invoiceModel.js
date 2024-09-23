@@ -6,9 +6,9 @@ const invoiceSchema = new mongo.Schema({
     phone: { type: String, required: true },
     date: { type: String, required: true },
     description: { type: String, required: true },
-    totalamount: { type: Number, required: true },
-    gstamount: { type: Number, required: true },
-    baseamount: { type: Number, required: true },
+    totalAmount: { type: Number, required: true },
+    gstAmount: { type: Number, required: true },
+    baseAmount: { type: Number, required: true },
     gstNo: { type: String, required: true },
     email: { type: String }
 });

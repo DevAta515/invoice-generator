@@ -31,6 +31,7 @@ const SignUp = () => {
             } else {
                 const body = { name, email, password };
                 const response = await axios.post("http://localhost:3000/signup", body);
+                console.log("Signing up")
                 if (response.data.success) {
                     localStorage.setItem("token", response.data.token);
                     navigate("/option");

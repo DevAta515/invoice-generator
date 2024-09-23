@@ -7,6 +7,7 @@ const clientRoute = require("./routes/clientRoute");
 const invoiceRoute = require("./routes/invoiceRoute");
 const connection = require("./config/db.js");
 const cors = require("cors");
+const MongoStore = require('connect-mongo');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,12 +22,21 @@ app.use(cors({
 app.use(express.json());
 
 // Session middleware
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallbackSecretKey',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // For development; change to true in production with HTTPS
-}));
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGO_URI,  // MongoDB connection URL
+        }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24,  // 1 day
+            httpOnly: true,  // For security
+            sameSite: 'lax',  // Adjust based on your setup (lax is recommended)
+        },
+    })
+);
 
 
 // Passport middleware

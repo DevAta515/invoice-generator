@@ -121,8 +121,10 @@ router.get("/getToken", (req, res) => {
         success: true, token: req.session.token
     });
 });
+
+
 router.post("/clearToken", (req, res) => {
-    console.log("Clearing session token...");
+    // console.log("Clearing session token...");
 
     req.session.destroy(err => {
         if (err) {
