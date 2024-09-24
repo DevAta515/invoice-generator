@@ -112,17 +112,17 @@ router.post("/get", async (req, res) => {
 
 router.put("/update", async (req, res) => {
     try {
+        console.log(req.body);
         const body = req.body;
         const invoiceNo = body.invoiceNo;
         const changes = body.changes;
         if (changes.baseAmount) {
-            const baseAmount = changes.baseAmount; // Declare the baseAmount variable
-            const gstAmount = (18 * baseAmount) / 100; // Declare and calculate gstAmount
-            const totalAmount = baseAmount + gstAmount; // Declare and calculate totalAmount
+            const baseAmount = Number(changes.baseAmount); // Ensure baseAmount is a number
+            const gstAmount = (18 * baseAmount) / 100; // Calculate gstAmount as a number
+            const totalAmount = baseAmount + gstAmount; // Ensure the addition is numerical
             changes.gstAmount = gstAmount; // Update changes object with calculated gstAmount
             changes.totalAmount = totalAmount; // Update changes object with calculated totalAmount
         }
-
 
         // Find the invoice by invoiceNo and update with the provided changes
         const updatedInvoice = await Invoice.findOneAndUpdate(
@@ -136,7 +136,7 @@ router.put("/update", async (req, res) => {
         }
 
         // If successfully updated, send the updated invoice back
-        return res.status(200).json(updatedInvoice);
+        return res.status(200).json({ success: true, updatedInvoice });
     } catch (error) {
         // Catch any errors and return a 500 response with the error message
         console.error('Error updating invoice:', error);

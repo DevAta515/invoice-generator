@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from "../components/Navbar"
 import Invoice from '../components/Invoice';
+import { useNavigate } from 'react-router-dom'
 
 
 const View = () => {
@@ -10,19 +11,55 @@ const View = () => {
     const [invoices, setInvoices] = useState([]); // Fetched invoices
     const [error, setError] = useState('');    // Error message
     const [loading, setLoading] = useState(false); // Loading state
+    const [token, setToken] = useState(localStorage.getItem("token"));
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!token) navigate("/");
+    })
+    // useEffect(() => {
+    //     const fetchToken = async () => {
+    //         try {
+    //             const response = await axios.get('http://localhost:3000/getToken', {
+    //                 withCredentials: true // This is important for sending cookies
+    //             })
+    //             if (response.data.success) {
+    //                 if (response.data.success != undefined && response.data.token != null) {
+    //                     localStorage.setItem('token', response.data.token);
+    //                     setToken(response.data.token);
+    //                 } else {
+    //                     navigate('/');
+    //                     console.log('Did not get the token');
+    //                 }
+    //             } else {
+    //                 if (localStorage.getItem("token")) {
+    //                     navigate("/option")
+    //                 } else {
+    //                     navigate("/");
+    //                 }
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching token:', error);
+    //         }
+    //     };
+
+    //     fetchToken(); // Call the async function
+    // }, []);
+
+
+
 
     // Function to fetch invoices based on the selected option (name or date)
     const handleFetchInvoices = async () => {
         try {
             setLoading(true);
             const response = await axios.post("http://localhost:3000/invoice/get", {
-                option: option,  // Sending which option (name or date)
-                input: input     // The actual value (name or date)
+                option: option,
+                input: input
             })
             setInvoices(response.data.data);
             setError('');
         } catch (err) {
-            setError('Error fetching invoices. Please try again.');
+            setError('Invoice Not Found');
             setInvoices([]);
         } finally {
             setLoading(false);
@@ -83,12 +120,12 @@ const View = () => {
                     </div>
                 )}
 
-                {/* Error Message */}
+                {/* Error Message
                 {error && (
                     <div className="text-center text-red-600 mt-6">
                         <p>{error}</p>
                     </div>
-                )}
+                )} */}
 
                 {/* Display Fetched Invoices */}
                 <div className="mt-10">

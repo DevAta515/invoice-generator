@@ -65,7 +65,7 @@ const Option = () => {
                     <div className="bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out transform hover:scale-105 cursor-pointer">
                         <div className="p-6 flex flex-col items-center">
                             <div className="w-16 h-16 bg-blue-200 text-blue-700 rounded-full flex items-center justify-center mb-4"
-                                onClick={() => navigate("/edit")}
+                                onClick={() => navigate("/view")}
                             >
                                 <FaPencilAlt className="w-10 h-10 hover:scale-110 transition-transform duration-300 ease-in-out" />
                             </div>

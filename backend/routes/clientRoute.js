@@ -25,7 +25,7 @@ router.post('/add', async (req, res) => {
         const client = await Client.findOne({ gstNo: body.gstNo });
 
         if (client) {
-            return res.status(400).json({
+            return res.status(201).json({
                 success: true,
                 message: "Client already exists"
             });

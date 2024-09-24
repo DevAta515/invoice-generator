@@ -8,8 +8,10 @@ const Navbar = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        setIsAuthenticated(!!token);
-    });
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    },);
 
 
     const handleLogout = async () => {

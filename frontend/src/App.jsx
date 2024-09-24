@@ -6,12 +6,12 @@ import { Routes, Route } from "react-router-dom"
 import Option from './pages/Option';
 import InvoiceForm from './pages/InvoiceForm';
 import View from './pages/View'
-
+import UpdateForm from "./pages/UpdateForm";
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
     localStorage.clear();
-  })
+  }, [])
   return (
     <>
       <Routes>
@@ -20,6 +20,7 @@ function App() {
         <Route path="/option" element={<Option />}  ></Route>
         <Route path="/create" element={<InvoiceForm />}  ></Route>
         <Route path="/view" element={<View />}  ></Route>
+        <Route path="/updateForm" element={<UpdateForm />}  ></Route>
       </Routes>
     </>
   )
