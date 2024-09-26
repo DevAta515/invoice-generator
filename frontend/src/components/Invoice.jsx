@@ -5,13 +5,14 @@ import { useNavigate } from "react-router-dom"
 const Invoice = ({ invoice }) => {
     const navigate = useNavigate();
     const setInvoice = useSetRecoilState(viewAtom);
+    if (!localStorage.getItem("token")) {
+        navigate("/")
+    }
     const handleEdit = () => {
         setInvoice(invoice);
         console.log(invoice);
         navigate("/updateForm")
     }
-
-
     return (
         <div className="relative p-6 bg-white border border-gray-300 rounded-lg shadow-lg w-4/5 mx-auto mb-6">
             {/* Edit Button */}

@@ -13,37 +13,36 @@ const View = () => {
     const [loading, setLoading] = useState(false); // Loading state
     const [token, setToken] = useState(localStorage.getItem("token"));
     const navigate = useNavigate();
-    useEffect(() => {
-        if (!token) navigate("/");
-    })
-    // useEffect(() => {
-    //     const fetchToken = async () => {
-    //         try {
-    //             const response = await axios.get('http://localhost:3000/getToken', {
-    //                 withCredentials: true // This is important for sending cookies
-    //             })
-    //             if (response.data.success) {
-    //                 if (response.data.success != undefined && response.data.token != null) {
-    //                     localStorage.setItem('token', response.data.token);
-    //                     setToken(response.data.token);
-    //                 } else {
-    //                     navigate('/');
-    //                     console.log('Did not get the token');
-    //                 }
-    //             } else {
-    //                 if (localStorage.getItem("token")) {
-    //                     navigate("/option")
-    //                 } else {
-    //                     navigate("/");
-    //                 }
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching token:', error);
-    //         }
-    //     };
 
-    //     fetchToken(); // Call the async function
-    // }, []);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/getToken', {
+                    withCredentials: true // This is important for sending cookies
+                })
+                if (response.data.success) {
+                    if (response.data.success != undefined && response.data.token != null) {
+                        localStorage.setItem('token', response.data.token);
+                        setToken(response.data.token);
+                    } else {
+                        navigate('/');
+                        console.log('Did not get the token');
+                    }
+                } else {
+                    if (localStorage.getItem("token")) {
+                        navigate("/option")
+                    } else {
+                        navigate("/");
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+            }
+        };
+
+        fetchToken(); // Call the async function
+    }, []);
 
 
 

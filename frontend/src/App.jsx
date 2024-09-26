@@ -7,6 +7,7 @@ import Option from './pages/Option';
 import InvoiceForm from './pages/InvoiceForm';
 import View from './pages/View'
 import UpdateForm from "./pages/UpdateForm";
+import InvoicePage from './pages/InvoicePage';
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/create" element={<InvoiceForm />}  ></Route>
         <Route path="/view" element={<View />}  ></Route>
         <Route path="/updateForm" element={<UpdateForm />}  ></Route>
+        <Route path="/check" element={<InvoicePage />}  ></Route>
       </Routes>
     </>
   )

@@ -10,3 +10,8 @@ export const viewAtom = atom({
     default: {},
     effects_UNSTABLE: [persistAtom], // Persist the state across refreshes
 });
+export const invoiceAtom = atom({
+    key: 'invoiceAtom',
+    default: {},
+    effects_UNSTABLE: [persistAtom],
+})

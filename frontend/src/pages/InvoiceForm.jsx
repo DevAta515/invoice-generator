@@ -1,8 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom"
+import { invoiceAtom } from '../store/atom';
+import { useSetRecoilState } from "recoil"
 
 const InvoiceForm = () => {
+    const navigate = useNavigate();
+    const setInvoice = useSetRecoilState(invoiceAtom);
+    const [token, setToken] = useState(localStorage.getItem("token"));
+    useEffect(() => {
+        const fetchToken = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/getToken', {
+                    withCredentials: true // This is important for sending cookies
+                })
+                if (response.data.success) {
+                    if (response.data.success != undefined && response.data.token != null) {
+                        localStorage.setItem('token', response.data.token);
+                        setToken(response.data.token);
+                    } else {
+                        navigate('/');
+                        console.log('Did not get the token');
+                    }
+                } else {
+                    if (localStorage.getItem("token")) {
+                        navigate("/option")
+                    } else {
+                        navigate("/");
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+            }
+        };
+
+        fetchToken(); // Call the async function
+    }, []);
+
     const [clientDetails, setClientDetails] = useState({
         name: '',
         address: '',
@@ -113,17 +148,21 @@ const InvoiceForm = () => {
             const response2 = await axios.post("http://localhost:3000/client/add", clientData);
             if (response2.data.success) {
                 console.log("Client added");
+
             } else {
                 console.log("Failed to add client:", response2.data.message);
             }
             const response1 = await axios.post("http://localhost:3000/invoice/add", formData);
             if (response1.data.success) {
                 console.log("Invoice added");
+                console.log(formData)
+                setInvoice(formData);
+                navigate('/check');
             } else {
                 console.log("Failed to add invoice:", response1.data.message);
             }
 
-            // Make the second API request
+
 
         } catch (error) {
             console.error("Error occurred while submitting:", error);
