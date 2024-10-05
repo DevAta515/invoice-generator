@@ -42,7 +42,7 @@ const InvoicePage = () => {
 
                     {/* Invoice header */}
                     <div className="flex justify-between items-center pb-6">
-                        <div className="bg-[#E85523] px-8 py-2 inline-block pb-8">
+                        <div className="bg-[#E85523] px-8 pt-1 inline-block pb-8">
                             <h1 className="text-5xl font-bold text-white">Invoice</h1>
                         </div>
                         <div>
