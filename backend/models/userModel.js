@@ -4,8 +4,8 @@ const bcrypt = require('bcryptjs'); // To hash passwords
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String }, // Will be null for Google OAuth users
-    googleId: { type: String }, // Will be null for email/password users
+    password: { type: String },
+    googleId: { type: String },
 });
 
 // Hash password before saving a user

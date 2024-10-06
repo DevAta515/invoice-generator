@@ -13,12 +13,13 @@ const clientSchema = zod.object({
 router.post('/add', async (req, res) => {
     try {
         const body = req.body;
-        const { success } = clientSchema.safeParse(body);
+        const { success, error } = clientSchema.safeParse(body);
 
         if (!success) {
             return res.status(400).json({
                 success: false,
-                message: "Enter correct details"
+                message: "Enter correct details",
+                error: error.errors
             });
         }
 

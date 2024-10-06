@@ -4,17 +4,20 @@ import { useRecoilValue } from "recoil";
 import { invoiceAtom } from '../store/atom';
 import { useNavigate } from "react-router-dom";
 import { usePDF } from 'react-to-pdf';
-import ReactToPdf from 'react-to-pdf';  // Correct import
 
 const InvoicePage = () => {
     const { toPDF, targetRef } = usePDF({ filename: 'page.pdf' });
     const invoice = useRecoilValue(invoiceAtom);
     const navigate = useNavigate();
     const ref = useRef();  // Reference to the PDF container
-
+    console.log(invoice);
     if (!localStorage.getItem("token")) {
         navigate("/");
     }
+
+    const totalBaseAmount = invoice.items.reduce((sum, item) => sum + item.baseAmount, 0);
+    const totalGstAmount = invoice.items.reduce((sum, item) => sum + item.gstAmount, 0);
+    const totalAmount = invoice.items.reduce((sum, item) => sum + item.totalAmount, 0);
 
     return (
         <>
@@ -30,7 +33,6 @@ const InvoicePage = () => {
             <div ref={targetRef} className="relative bg-gray-100 p-10 font-sans">
                 {/* Main Invoice Content */}
                 <div ref={ref} className="relative z-10 max-w-4xl mx-auto bg-white p-10 rounded-lg shadow-md border border-gray-300">
-                    {/* Your existing invoice content */}
                     {/* Watermark */}
                     <div className="absolute inset-0 flex justify-center items-center opacity-[.1] pointer-events-none z-20">
                         <img
@@ -42,7 +44,7 @@ const InvoicePage = () => {
 
                     {/* Invoice header */}
                     <div className="flex justify-between items-center pb-6">
-                        <div className="bg-[#E85523] px-8 pt-1 inline-block pb-8">
+                        <div className="bg-[#E85523] px-8 inline-block pb-8">
                             <h1 className="text-5xl font-bold text-white">Invoice</h1>
                         </div>
                         <div>
@@ -57,7 +59,6 @@ const InvoicePage = () => {
                             <h2 className="text-xl font-bold text-[#E85523] mb-2">BILLED TO</h2>
                             <p className="text-lg font-semibold text-orange-600">{invoice.name}</p>
                             <p className="text-gray-600">{invoice.address}</p>
-                            <p className="text-gray-600">{invoice.city}, {invoice.state}, {invoice.zipCode}</p>
                             <p className="text-lg font-bold text-[#E85523]">{invoice.gstIn}</p>
                         </div>
 
@@ -86,14 +87,18 @@ const InvoicePage = () => {
                                 <thead>
                                     <tr>
                                         <th className="text-xl py-2 text-[#E85523]">DESCRIPTION</th>
+                                        <th className="text-right py-2 text-gray-600">GST (18%)</th>
                                         <th className="py-2 text-right text-gray-600">AMOUNT</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td className="text-lg py-4 text-gray-800">{invoice.description}</td>
-                                        <td className="text-xl py-4 text-right text-gray-800">{invoice.baseAmount}</td>
-                                    </tr>
+                                    {invoice.items.map((item, index) => (
+                                        <tr key={index}>
+                                            <td className="text-lg py-4 text-gray-800">{item.description}</td>
+                                            <td className="text-xl py-4 text-right text-gray-800">{item.gstAmount}</td>
+                                            <td className="text-xl py-4 text-right text-gray-800">{item.baseAmount}</td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -104,15 +109,15 @@ const InvoicePage = () => {
                         <div className="w-1/3">
                             <div className="flex justify-between mb-2">
                                 <p className="text-gray-700">TOTAL</p>
-                                <p className="text-xl text-gray-700">{invoice.baseAmount}</p>
+                                <p className="text-xl text-gray-700">{totalBaseAmount}</p>
                             </div>
                             <div className="flex justify-between mb-2">
                                 <p className="text-gray-700">GST(18%)</p>
-                                <p className="text-xl text-gray-700">{invoice.gstAmount}</p>
+                                <p className="text-xl text-gray-700">{totalGstAmount}</p>
                             </div>
                             <div className="flex justify-between font-bold text-lg border-t-2 border-[#E85523] pt-4">
                                 <p className="text-black">AMOUNT</p>
-                                <p className=" text-2xl text-black">{invoice.totalAmount}</p>
+                                <p className=" text-2xl text-black">{totalAmount}</p>
                             </div>
                         </div>
                     </div>

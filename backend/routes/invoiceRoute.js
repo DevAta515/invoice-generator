@@ -4,45 +4,58 @@ const zod = require("zod");
 const Invoice = require("../models/invoiceModel")
 const Client = require("../models/clientModel")
 
+const itemSchema = zod.object({
+    description: zod.string(),
+    baseAmount: zod.number(),
+    gstAmount: zod.number(),
+    totalAmount: zod.number()
+});
+
+// Define invoice schema with reference to user and array of items
 const invoiceSchema = zod.object({
     invoiceNo: zod.string().startsWith("PT").length(8),
     name: zod.string(),
     address: zod.string(),
     phone: zod.string(),
     date: zod.string(),
-    description: zod.string(),
-    totalAmount: zod.number(),
-    gstAmount: zod.number(),
-    baseAmount: zod.number(),
     gstNo: zod.string().min(15),
+    email: zod.string().email().optional(),
+    items: zod.array(itemSchema)
+});
+const clientSchema = zod.object({
+    name: zod.string(),
+    address: zod.string(),
+    phone: zod.string(),
+    gstNo: zod.string().length(15),
     email: zod.string().email().optional(),
 })
 
 router.post("/add", async (req, res) => {
     try {
         const body = req.body;
+        const { name, address, phone, gstNo, email, items } = req.body;
+        const clientBody = { name, address, phone, gstNo, email };
+        console.log(clientBody)
+        console.log(items)
         const { success, error } = invoiceSchema.safeParse(body);
         if (!success) {
             return res.status(400).json({
                 success: false,
-                msg: "Enter correct details",
+                msg: "Enter correct invoice details",
                 error: error.errors
             });
         }
-        const client = await Client.findOne({ gstNo: body.gstNo });
-        if (!client) {
-            return res.status(404).json({
-                success: false,
-                msg: "Client not found"
-            });
+        let newClient = await Client.findOne({ gstNo: body.gstNo });
+        if (!newClient) {
+            newClient = new Client(clientBody);
+            await newClient.save();
         }
 
         const invoice = new Invoice(body);
         await invoice.save();
         console.log("here")
-        // Add the invoice ID to the client's 'invoices' array
-        client.invoices.push(invoice._id);
-        await client.save();
+        newClient.invoices.push(invoice._id);
+        await newClient.save();
 
         return res.status(201).json({
             success: true,
