@@ -7,7 +7,7 @@ import { useReactToPrint } from 'react-to-print';
 
 const InvoicePage = () => {
     const invoice = useRecoilValue(invoiceAtom);
-    console.log(invoice)
+    console.log(typeof (invoice.items.baseAmount))
     const navigate = useNavigate();
     const contentRef = useRef(null); // Reference to the PDF container
 
@@ -32,20 +32,20 @@ const InvoicePage = () => {
                 </button>
             </div>
 
-            <div ref={contentRef} className="min-h-screen flex flex-col bg-white px-1 font-sans">
+            <div ref={contentRef} className="min-h-screen flex flex-col bg-white px-1 font-sans mx-3">
                 {/* Main Invoice Content */}
                 <div className="flex-grow relative z-10 w-[100%] h-[100%] bg-white p-4">
                     {/* Watermark */}
-                    <div className="absolute inset-0 flex justify-center items-center opacity-[.1] pointer-events-none z-20 watermark">
+                    <div className="absolute top-[25%] inset-0 flex justify-center items-center opacity-[.05] pointer-events-none z-20 watermark">
                         <img
                             src={Logo}
                             alt="Phoenix Watermark"
-                            className="w-[80%] h-1/3 object-contain"
+                            className="w-[80%] h-[60%] object-contain"
                         />
                     </div>
 
                     {/* Invoice header */}
-                    <div className="flex justify-between items-center pb-6">
+                    <div className="flex justify-between items-center pb-16">
                         <div className="bg-[#E85523] px-8 inline-block py-5">
                             <h1 className="text-5xl font-bold text-white">Invoice</h1>
                         </div>
@@ -59,6 +59,7 @@ const InvoicePage = () => {
                         <div className="w-1/2">
                             <h2 className="text-xl font-bold text-[#E85523] mb-2">BILLED TO</h2>
                             <p className="text-lg font-semibold text-orange-600">{invoice.name}</p>
+                            <p className="text-lg text-orange-600">GST - {invoice.gstNo}</p>
                             <p className="text-gray-600">{invoice.address}</p>
                             <p className="text-lg font-bold text-[#E85523]">{invoice.gstIn}</p>
                         </div>
@@ -66,36 +67,38 @@ const InvoicePage = () => {
                         <div className="w-1/2">
                             <h2 className="text-xl font-bold text-[#E85523] mb-2">BILLING DETAILS</h2>
                             <p className="text-lg font-semibold text-orange-600">PHOENIX TECHNOSOFT</p>
-                            <p className="text-gray-600">ACCOUNT NUMBER - 924020034149080</p>
-                            <p className="text-gray-600">IFSC - UTIB0002498</p>
-                            <p className="text-gray-600">UPI - PHOENIXTECH@AXISBANK</p>
+                            <p className="text-orange-600">ACCOUNT NUMBER - 924020034149080</p>
+                            <p className="text-orange-600">IFSC - UTIB0002498</p>
+                            <p className="text-orange-600">UPI - PHOENIXTECH@AXISBANK</p>
                             <p className="text-gray-600">Shop No-65, New Defence Colony, Muradnagar, Ghaziabad, Uttar Pradesh, 201206</p>
-                            <p className="text-gray-600">GST - 09ASPPT1664A1ZI | SAC Code- 9983</p>
+                            <p className="text-gray-600">GST - 09ASPPT1664A1ZI</p>
                         </div>
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-12">
                         <p className="text-lg font-bold text-[#E85523]">DATE: {invoice.date}</p>
                         <p className="text-2xl text-gray-600">INVOICE#  {invoice.invoiceNo}</p>
                     </div>
 
                     {/* Invoice Description Table */}
                     <div className="">
-                        <div className="border-t-4 border-[#E85523]">
+                        <div className="">
                             <table className="w-full mt-4 text-left">
                                 <thead>
                                     <tr>
                                         <th className="text-xl py-2 text-[#E85523]">DESCRIPTION</th>
+                                        <th className="text-right py-2 text-gray-600">SAC Code</th>
                                         <th className="text-right py-2 text-gray-600">GST (18%)</th>
                                         <th className="py-2 text-right text-gray-600">AMOUNT</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="border-t-4 border-[#E85523]">
                                     {invoice.items.map((item, index) => (
                                         <tr key={index}>
-                                            <td className="text-lg py-1 text-gray-800">{item.description}</td>
-                                            <td className="text-lg py-1 text-right text-gray-800">{item.gstAmount.toFixed(2)}</td>
-                                            <td className="text-lg py-1 text-right text-gray-800">{item.baseAmount.toFixed(2)}</td>
+                                            <td className="text-lg pt-4 text-gray-800">{item.description}</td>
+                                            <td className="text-lg pt-4 text-right text-gray-800">998352</td>
+                                            <td className="text-lg pt-4 text-right text-gray-800">{new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(item.gstAmount)}</td>
+                                            <td className="text-lg pt-4 text-right text-gray-800">{new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(item.baseAmount)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -108,28 +111,30 @@ const InvoicePage = () => {
                         <div className="w-1/3">
                             <div className="flex justify-between mb-2">
                                 <p className="text-gray-700">TOTAL</p>
-                                <p className="text-xl text-gray-700">{totalBaseAmount.toFixed(2)}</p>
+                                <p className="text-xl text-gray-700">{new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalBaseAmount)}</p>
                             </div>
                             <div className="flex justify-between mb-2">
                                 <p className="text-gray-700">GST(18%)</p>
-                                <p className="text-xl text-gray-700">{totalGstAmount.toFixed(2)}</p>
+                                <p className="text-xl text-gray-700">{new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalGstAmount)}</p>
                             </div>
                             <div className="flex justify-between font-bold text-lg border-t-2 border-[#E85523] pt-4">
                                 <p className="text-black">AMOUNT</p>
-                                <p className="text-2xl text-black">{totalAmount.toFixed(2)}</p>
+                                <p className="text-2xl text-black">{new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalAmount)}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Footer always at the bottom */}
-                <div className="footer mt-1 pb-3 pl-4">
+                <div className="footer mb-20 pl-6">
                     <p className="text-lg font-semibold text-gray-700 ">Have Questions?</p>
                     <p className="text-gray-600">Call us: 8587 888 326</p>
                     <p className="text-gray-600">Mail us: phoenixtechnosoftindia@gmail.com</p>
+                    <p className="text-orange-600 font-bold">www.phoenixtechnosoft.com</p>
                     <p className="italic text-sm text-gray-500 mt-1">
-                        This package is prepared by Phoenix Technosoft Pvt. Ltd.<br />
-                        For any discrepancy, kindly connect within 24 hours from the date of generation.
+                        This package is prepared by Phoenix Technosoft<br />
+                        For any discrepancy, kindly connect within 24 hours from the date of generation.<br />
+                        No refunds will be entertained.
                     </p>
                 </div>
             </div>

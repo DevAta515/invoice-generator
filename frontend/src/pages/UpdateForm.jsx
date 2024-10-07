@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
-import { viewAtom } from '../store/atom';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { viewAtom, invoiceAtom } from '../store/atom';
 import { useNavigate } from 'react-router-dom';
 
 const UpdateForm = () => {
     const invoiceData = useRecoilValue(viewAtom); // Get the current invoice data from Recoil
+    const setInvoice = useSetRecoilState(invoiceAtom);
     const [updatedValues, setUpdatedValues] = useState(invoiceData || {});
     const [popupVisible, setPopupVisible] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
@@ -85,7 +86,8 @@ const UpdateForm = () => {
                 setPopupSuccess(true);
                 setTimeout(() => {
                     setPopupVisible(false);
-                    navigate('/option');
+                    setInvoice(updatedData)
+                    navigate('/check');
                 }, 1500);
             } else {
                 setPopupMessage('Failed to update the invoice.');
