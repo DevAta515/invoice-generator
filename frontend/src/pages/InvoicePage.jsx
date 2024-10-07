@@ -7,6 +7,7 @@ import { useReactToPrint } from 'react-to-print';
 
 const InvoicePage = () => {
     const invoice = useRecoilValue(invoiceAtom);
+    console.log(invoice)
     const navigate = useNavigate();
     const contentRef = useRef(null); // Reference to the PDF container
 
@@ -45,7 +46,7 @@ const InvoicePage = () => {
 
                     {/* Invoice header */}
                     <div className="flex justify-between items-center pb-6">
-                        <div className="bg-[#E85523] px-8 inline-block pb-8">
+                        <div className="bg-[#E85523] px-8 inline-block py-5">
                             <h1 className="text-5xl font-bold text-white">Invoice</h1>
                         </div>
                         <div>

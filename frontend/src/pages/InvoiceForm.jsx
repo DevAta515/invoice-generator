@@ -51,7 +51,7 @@ const InvoiceForm = () => {
     const [invoiceNumber, setInvoiceNumber] = useState('');
 
     // Set the date once when the component loads
-    const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().split('T')[0]);
+    const [invoiceDate, setInvoiceDate] = useState();
 
     const [clientNames, setClientNames] = useState([]);
 
@@ -215,11 +215,11 @@ const InvoiceForm = () => {
                             />
                             <input
                                 type="date"
-                                value={invoiceDate}
-                                onChange={(e) => setInvoiceDate(e.target.value)}
+                                value={invoiceDate} // Already set to today's date by default
                                 className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
+                                required// This disables the input, preventing any changes
                             />
+
                         </div>
                     </div>
 
