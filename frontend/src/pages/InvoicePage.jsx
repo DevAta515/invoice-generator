@@ -3,14 +3,14 @@ import Logo from '../assets/Logo.png';
 import { useRecoilValue } from "recoil";
 import { invoiceAtom } from '../store/atom';
 import { useNavigate } from "react-router-dom";
-import { usePDF } from 'react-to-pdf';
+import { useReactToPrint } from 'react-to-print';
+import { ReactToPrint } from "react-to-print";
 
 const InvoicePage = () => {
-    const { toPDF, targetRef } = usePDF({ filename: 'page.pdf' });
     const invoice = useRecoilValue(invoiceAtom);
     const navigate = useNavigate();
-    const ref = useRef();  // Reference to the PDF container
-    console.log(invoice);
+    const contentRef = useRef(null); // Reference to the PDF container
+
     if (!localStorage.getItem("token")) {
         navigate("/");
     }
@@ -19,22 +19,24 @@ const InvoicePage = () => {
     const totalGstAmount = invoice.items.reduce((sum, item) => sum + item.gstAmount, 0);
     const totalAmount = invoice.items.reduce((sum, item) => sum + item.totalAmount, 0);
 
+    const reactToPrintFn = useReactToPrint({ contentRef });
+
     return (
         <>
             <div className="flex justify-center items-center my-4">
                 <button
+                    onClick={reactToPrintFn}
                     className="bg-gradient-to-r from-orange-400 to-orange-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-orange-500 hover:to-orange-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-300"
-                    onClick={() => toPDF()}
                 >
-                    Download PDF
+                    Print Invoice
                 </button>
             </div>
 
-            <div ref={targetRef} className="relative bg-gray-100 p-10 font-sans">
+            <div ref={contentRef} className="relative bg-white px-1 font-sans">
                 {/* Main Invoice Content */}
-                <div ref={ref} className="relative z-10 max-w-4xl mx-auto bg-white p-10 rounded-lg shadow-md border border-gray-300">
+                <div className="relative z-10 w-[100%] h-[100%] bg-white p-10 ">
                     {/* Watermark */}
-                    <div className="absolute inset-0 flex justify-center items-center opacity-[.1] pointer-events-none z-20">
+                    <div className="absolute inset-0 flex justify-center items-center opacity-[.1] pointer-events-none z-20 watermark">
                         <img
                             src={Logo}
                             alt="Phoenix Watermark"
@@ -54,7 +56,6 @@ const InvoicePage = () => {
 
                     {/* Billed To and Billing Details */}
                     <div className="flex justify-between space-x-12 mt-6">
-                        {/* Billed To Section */}
                         <div className="w-1/2">
                             <h2 className="text-xl font-bold text-[#E85523] mb-2">BILLED TO</h2>
                             <p className="text-lg font-semibold text-orange-600">{invoice.name}</p>
@@ -62,7 +63,6 @@ const InvoicePage = () => {
                             <p className="text-lg font-bold text-[#E85523]">{invoice.gstIn}</p>
                         </div>
 
-                        {/* Billing Details Section */}
                         <div className="w-1/2">
                             <h2 className="text-xl font-bold text-[#E85523] mb-2">BILLING DETAILS</h2>
                             <p className="text-lg font-semibold text-orange-600">PHOENIX TECHNOSOFT</p>
@@ -74,7 +74,6 @@ const InvoicePage = () => {
                         </div>
                     </div>
 
-                    {/* GST and Invoice Details */}
                     <div className="mt-6">
                         <p className="text-lg font-bold text-[#E85523]">DATE: {invoice.date}</p>
                         <p className="text-2xl text-gray-600">INVOICE#  {invoice.invoiceNo}</p>
@@ -117,26 +116,24 @@ const InvoicePage = () => {
                             </div>
                             <div className="flex justify-between font-bold text-lg border-t-2 border-[#E85523] pt-4">
                                 <p className="text-black">AMOUNT</p>
-                                <p className=" text-2xl text-black">{totalAmount}</p>
+                                <p className="text-2xl text-black">{totalAmount}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Contact Info */}
                     <div className="mt-6">
                         <p className="text-lg font-semibold text-gray-700 mb-2">Have Questions?</p>
                         <p className="text-gray-600">Call us: 8587 888 326</p>
                         <p className="text-gray-600">Mail us: phoenixtechnosoftindia@gmail.com</p>
-
                         <p className="italic text-sm text-gray-500 mt-6">
-                            This package doesn’t come with a performance guarantee. We reserve the right to change our terms & conditions without notice. No refunds will be entertained.
+                            This package is prepared by Phoenix Technosoft Pvt. Ltd.<br />
+                            For any discrepancy, kindly connect within 24 hours from the date of generation.
                         </p>
-                        <p className="mt-4 text-blue-700">www.phoenixtechnosoft.com</p>
                     </div>
                 </div>
             </div>
         </>
     );
-};
+}
 
 export default InvoicePage;

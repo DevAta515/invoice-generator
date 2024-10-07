@@ -10,3 +10,17 @@ body{
     margin:0;
     padding:0;
 }
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .invoice-container {
+        margin: 0;
+    }
+
+    @page {
+        size: A4;
+        margin: 0;
+    }
+}
