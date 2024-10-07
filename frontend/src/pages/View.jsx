@@ -97,7 +97,7 @@ const View = () => {
                 {option && (
                     <div className="flex flex-col items-center">
                         <input
-                            type="text"
+                            type={option == 'name' ? 'text' : 'date'}
                             placeholder={option === 'name' ? 'Enter Name' : 'Enter Date (YYYY-MM-DD)'}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}

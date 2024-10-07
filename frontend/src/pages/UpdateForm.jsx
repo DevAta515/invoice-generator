@@ -6,58 +6,76 @@ import { viewAtom } from '../store/atom';
 import { useNavigate } from 'react-router-dom';
 
 const UpdateForm = () => {
-    const invoiceData = useRecoilValue(viewAtom);
-    const [updatedValues, setUpdatedValues] = useState({});
+    const invoiceData = useRecoilValue(viewAtom); // Get the current invoice data from Recoil
+    const [updatedValues, setUpdatedValues] = useState(invoiceData || {});
     const [popupVisible, setPopupVisible] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
     const [popupSuccess, setPopupSuccess] = useState(false);
     const [token, setToken] = useState(localStorage.getItem("token"));
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchToken = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/getToken', {
                     withCredentials: true // This is important for sending cookies
-                })
-                if (response.data.success) {
-                    if (response.data.success != undefined && response.data.token != null) {
-                        localStorage.setItem('token', response.data.token);
-                        setToken(response.data.token);
-                    } else {
-                        navigate('/');
-                        console.log('Did not get the token');
-                    }
+                });
+                if (response.data.success && response.data.token) {
+                    localStorage.setItem('token', response.data.token);
+                    setToken(response.data.token);
                 } else {
-                    if (localStorage.getItem("token")) {
-                        navigate("/option")
-                    } else {
-                        navigate("/");
-                    }
+                    navigate('/');
+                    console.log('Did not get the token');
                 }
             } catch (error) {
                 console.error('Error fetching token:', error);
             }
         };
 
-        fetchToken(); // Call the async function
-    }, []);
+        fetchToken();
+    }, [navigate]);
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e, index = null) => {
         const { name, value } = e.target;
-        setUpdatedValues(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        const gstRate = 0.18; // Assume GST rate is 18%
+
+        if (index !== null) {
+            // Update values within items array
+            const updatedItems = [...updatedValues.items];
+            updatedItems[index] = { ...updatedItems[index], [name]: value };
+
+            // If baseAmount changes, update gstAmount and totalAmount
+            if (name === "baseAmount") {
+                const baseAmount = parseFloat(value) || 0;
+                const gstAmount = baseAmount * gstRate;
+                const totalAmount = baseAmount + gstAmount;
+
+                updatedItems[index] = {
+                    ...updatedItems[index],
+                    gstAmount: gstAmount.toFixed(2),
+                    totalAmount: totalAmount.toFixed(2)
+                };
+            }
+
+            setUpdatedValues(prevState => ({
+                ...prevState,
+                items: updatedItems
+            }));
+        } else {
+            // Update non-item fields
+            setUpdatedValues(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Send the entire form data as updatedData
         const updatedData = {
-            invoiceNo: invoiceData.invoiceNo,
-            changes: {
-                ...updatedValues,
-            },
+            ...updatedValues, // Spread the entire updatedValues object as the updated body
         };
 
         try {
@@ -67,8 +85,8 @@ const UpdateForm = () => {
                 setPopupSuccess(true);
                 setTimeout(() => {
                     setPopupVisible(false);
-                    navigate('/option'); // Redirect after success
-                }, 1500); // Redirect after 3 seconds
+                    navigate('/option');
+                }, 1500);
             } else {
                 setPopupMessage('Failed to update the invoice.');
                 setPopupSuccess(false);
@@ -81,18 +99,9 @@ const UpdateForm = () => {
         setPopupVisible(true);
         setTimeout(() => setPopupVisible(false), 3000);
     };
-
-    const tableFields = [
-        'invoiceNo',
-        'name',
-        'address',
-        'phone',
-        'email',
-        'gstNo',
-        'baseAmount',
-        'date',
-        'description'
-    ];
+    const handleWheel = (e) => {
+        e.target.blur();
+    };
 
     return (
         <>
@@ -111,7 +120,8 @@ const UpdateForm = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {tableFields.map((key) => (
+                                {/* Display main invoice details */}
+                                {['invoiceNo', 'name', 'address', 'phone', 'email', 'gstNo', 'date'].map((key) => (
                                     <tr key={key} className="bg-gray-50 hover:bg-gray-100 transition duration-300">
                                         <td className="px-6 py-4 font-medium capitalize text-gray-800">{key}</td>
                                         <td className="px-6 py-4 text-gray-600">{invoiceData[key] || "N/A"}</td>
@@ -127,6 +137,71 @@ const UpdateForm = () => {
                                             />
                                         </td>
                                     </tr>
+                                ))}
+
+                                {/* Display items in the invoice */}
+                                {updatedValues.items && updatedValues.items.map((item, index) => (
+                                    <React.Fragment key={index}>
+                                        <tr className="bg-gray-50 hover:bg-gray-100 transition duration-300">
+                                            <td className="px-6 py-4 font-medium capitalize text-gray-800">Item {index + 1} - Description</td>
+                                            <td className="px-6 py-4 text-gray-600">{item.description || "N/A"}</td>
+                                            <td className="px-6 py-4">
+                                                <input
+                                                    type="text"
+                                                    name="description"
+                                                    placeholder="Update description"
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    value={item.description || ''}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr className="bg-gray-50 hover:bg-gray-100 transition duration-300">
+                                            <td className="px-6 py-4 font-medium capitalize text-gray-800">Base Amount</td>
+                                            <td className="px-6 py-4 text-gray-600">{item.baseAmount}</td>
+                                            <td className="px-6 py-4">
+                                                <input
+                                                    type="number"
+                                                    name="baseAmount"
+                                                    placeholder="Update base amount"
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    value={item.baseAmount || ''}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    onWheel={handleWheel}
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr className="bg-gray-50 hover:bg-gray-100 transition duration-300">
+                                            <td className="px-6 py-4 font-medium capitalize text-gray-800">GST Amount</td>
+                                            <td className="px-6 py-4 text-gray-600">{item.gstAmount}</td>
+                                            <td className="px-6 py-4">
+                                                <input
+                                                    type="number"
+                                                    name="gstAmount"
+                                                    placeholder="Update GST amount"
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    value={item.gstAmount || ''}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    onWheel={handleWheel}
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr className="bg-gray-50 hover:bg-gray-100 transition duration-300">
+                                            <td className="px-6 py-4 font-medium capitalize text-gray-800">Total Amount</td>
+                                            <td className="px-6 py-4 text-gray-600">{item.totalAmount}</td>
+                                            <td className="px-6 py-4">
+                                                <input
+                                                    type="number"
+                                                    name="totalAmount"
+                                                    placeholder="Update total amount"
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    value={item.totalAmount || ''}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    onWheel={handleWheel}
+                                                />
+                                            </td>
+                                        </tr>
+                                    </React.Fragment>
                                 ))}
                             </tbody>
                         </table>
@@ -144,8 +219,8 @@ const UpdateForm = () => {
 
                 {/* Popup notification */}
                 {popupVisible && (
-                    <div className={`fixed top-10 right-10 p-4 rounded-lg shadow-lg transition-all duration-300 ${popupSuccess ? 'bg-green-500' : 'bg-red-500'} text-white`}>
-                        <p>{popupMessage}</p>
+                    <div className={`fixed top-10 right-10 p-4 rounded-md shadow-md ${popupSuccess ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                        {popupMessage}
                     </div>
                 )}
             </div>

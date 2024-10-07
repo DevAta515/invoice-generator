@@ -4,7 +4,6 @@ import { useRecoilValue } from "recoil";
 import { invoiceAtom } from '../store/atom';
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from 'react-to-print';
-import { ReactToPrint } from "react-to-print";
 
 const InvoicePage = () => {
     const invoice = useRecoilValue(invoiceAtom);
@@ -32,9 +31,9 @@ const InvoicePage = () => {
                 </button>
             </div>
 
-            <div ref={contentRef} className="relative bg-white px-1 font-sans">
+            <div ref={contentRef} className="min-h-screen flex flex-col bg-white px-1 font-sans">
                 {/* Main Invoice Content */}
-                <div className="relative z-10 w-[100%] h-[100%] bg-white p-10 ">
+                <div className="flex-grow relative z-10 w-[100%] h-[100%] bg-white p-10">
                     {/* Watermark */}
                     <div className="absolute inset-0 flex justify-center items-center opacity-[.1] pointer-events-none z-20 watermark">
                         <img
@@ -80,7 +79,7 @@ const InvoicePage = () => {
                     </div>
 
                     {/* Invoice Description Table */}
-                    <div className="mt-6">
+                    <div className="mt-3">
                         <div className="border-t-4 border-[#E85523]">
                             <table className="w-full mt-4 text-left">
                                 <thead>
@@ -93,9 +92,9 @@ const InvoicePage = () => {
                                 <tbody>
                                     {invoice.items.map((item, index) => (
                                         <tr key={index}>
-                                            <td className="text-lg py-4 text-gray-800">{item.description}</td>
-                                            <td className="text-xl py-4 text-right text-gray-800">{item.gstAmount}</td>
-                                            <td className="text-xl py-4 text-right text-gray-800">{item.baseAmount}</td>
+                                            <td className="text-lg py-1 text-gray-800">{item.description}</td>
+                                            <td className="text-lg py-1 text-right text-gray-800">{item.gstAmount.toFixed(2)}</td>
+                                            <td className="text-lg py-1 text-right text-gray-800">{item.baseAmount.toFixed(2)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -108,28 +107,29 @@ const InvoicePage = () => {
                         <div className="w-1/3">
                             <div className="flex justify-between mb-2">
                                 <p className="text-gray-700">TOTAL</p>
-                                <p className="text-xl text-gray-700">{totalBaseAmount}</p>
+                                <p className="text-xl text-gray-700">{totalBaseAmount.toFixed(2)}</p>
                             </div>
                             <div className="flex justify-between mb-2">
                                 <p className="text-gray-700">GST(18%)</p>
-                                <p className="text-xl text-gray-700">{totalGstAmount}</p>
+                                <p className="text-xl text-gray-700">{totalGstAmount.toFixed(2)}</p>
                             </div>
                             <div className="flex justify-between font-bold text-lg border-t-2 border-[#E85523] pt-4">
                                 <p className="text-black">AMOUNT</p>
-                                <p className="text-2xl text-black">{totalAmount}</p>
+                                <p className="text-2xl text-black">{totalAmount.toFixed(2)}</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="mt-6">
-                        <p className="text-lg font-semibold text-gray-700 mb-2">Have Questions?</p>
-                        <p className="text-gray-600">Call us: 8587 888 326</p>
-                        <p className="text-gray-600">Mail us: phoenixtechnosoftindia@gmail.com</p>
-                        <p className="italic text-sm text-gray-500 mt-6">
-                            This package is prepared by Phoenix Technosoft Pvt. Ltd.<br />
-                            For any discrepancy, kindly connect within 24 hours from the date of generation.
-                        </p>
-                    </div>
+                {/* Footer always at the bottom */}
+                <div className="footer mt-6 pb-3 pl-4">
+                    <p className="text-lg font-semibold text-gray-700 mb-2">Have Questions?</p>
+                    <p className="text-gray-600">Call us: 8587 888 326</p>
+                    <p className="text-gray-600">Mail us: phoenixtechnosoftindia@gmail.com</p>
+                    <p className="italic text-sm text-gray-500 mt-6">
+                        This package is prepared by Phoenix Technosoft Pvt. Ltd.<br />
+                        For any discrepancy, kindly connect within 24 hours from the date of generation.
+                    </p>
                 </div>
             </div>
         </>

@@ -97,7 +97,6 @@ router.post("/get", async (req, res) => {
             });
         }
         console.log(data);
-        // If no data is found, return a 404 response
         if (!data || data.length === 0) {
             return res.status(404).json({
                 success: false,
@@ -105,7 +104,6 @@ router.post("/get", async (req, res) => {
             });
         }
 
-        // Return the found invoice data with a success message
         console.log(data);
         return res.status(200).json({
             success: true,
@@ -113,7 +111,6 @@ router.post("/get", async (req, res) => {
         });
 
     } catch (error) {
-        // Handle any errors that occur during execution
         console.error(error);
         return res.status(500).json({
             success: false,
@@ -128,30 +125,21 @@ router.put("/update", async (req, res) => {
         console.log(req.body);
         const body = req.body;
         const invoiceNo = body.invoiceNo;
-        const changes = body.changes;
-        if (changes.baseAmount) {
-            const baseAmount = Number(changes.baseAmount); // Ensure baseAmount is a number
-            const gstAmount = (18 * baseAmount) / 100; // Calculate gstAmount as a number
-            const totalAmount = baseAmount + gstAmount; // Ensure the addition is numerical
-            changes.gstAmount = gstAmount; // Update changes object with calculated gstAmount
-            changes.totalAmount = totalAmount; // Update changes object with calculated totalAmount
-        }
 
-        // Find the invoice by invoiceNo and update with the provided changes
+
         const updatedInvoice = await Invoice.findOneAndUpdate(
-            { invoiceNo }, // Make sure to use the correct key, 'invoiceNo'
-            { $set: changes }, // Dynamically set the changes from the request body
-            { new: true, runValidators: true } // Return the updated document and run validations
+            { invoiceNo },
+            { $set: body },
+            { new: true, runValidators: true }
         );
 
         if (!updatedInvoice) {
             return res.status(404).json({ message: 'Invoice not found' });
         }
 
-        // If successfully updated, send the updated invoice back
+
         return res.status(200).json({ success: true, updatedInvoice });
     } catch (error) {
-        // Catch any errors and return a 500 response with the error message
         console.error('Error updating invoice:', error);
         return res.status(500).json({ message: 'Server error', error: error.message });
     }

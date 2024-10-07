@@ -48,8 +48,10 @@ const InvoiceForm = () => {
     });
 
     const [invoiceItems, setInvoiceItems] = useState([{ description: '', baseAmount: 0, gstAmount: 0, totalAmount: 0 }]);
-    const [invoiceNumber, setInvoiceNumber] = useState(''); // Dynamic invoice number
-    const [invoiceDate, setInvoiceDate] = useState(''); // User-input invoice date
+    const [invoiceNumber, setInvoiceNumber] = useState('');
+
+    // Set the date once when the component loads
+    const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().split('T')[0]);
 
     const [clientNames, setClientNames] = useState([]);
 
@@ -81,25 +83,19 @@ const InvoiceForm = () => {
         const updatedItems = [...invoiceItems];
 
         if (name === 'description') {
-            // Handle description change separately
-            updatedItems[index] = {
-                ...updatedItems[index],
-                description: value
-            };
+            updatedItems[index] = { ...updatedItems[index], description: value };
         } else if (name === 'baseAmount') {
-            // Handle baseAmount and recalculate gstAmount and totalAmount
             const numericValue = parseFloat(value) || 0; // Convert to number or default to 0
             updatedItems[index] = {
                 ...updatedItems[index],
                 baseAmount: numericValue,
-                gstAmount: (numericValue * 0.18), // Calculate GST
-                totalAmount: (numericValue + (numericValue * 0.18)) // Calculate total amount
+                gstAmount: numericValue * 0.18, // Calculate GST
+                totalAmount: numericValue + numericValue * 0.18 // Calculate total amount
             };
         }
 
         setInvoiceItems(updatedItems);
     };
-
 
     const handleAddItem = () => {
         setInvoiceItems([...invoiceItems, { description: '', baseAmount: 0, gstAmount: 0, totalAmount: 0 }]);
@@ -113,11 +109,11 @@ const InvoiceForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = {
-            invoiceNo: invoiceNumber, // Use dynamic invoice number
+            invoiceNo: invoiceNumber,
             name: clientDetails.name,
             address: clientDetails.address,
             phone: clientDetails.phone,
-            date: invoiceDate || new Date().toISOString().split('T')[0], // Use current date if not set
+            date: invoiceDate,
             items: invoiceItems.map(item => ({
                 description: item.description,
                 totalAmount: item.totalAmount,
@@ -129,10 +125,8 @@ const InvoiceForm = () => {
         };
 
         try {
-            // Submit the invoice
             const response = await axios.post("http://localhost:3000/invoice/add", formData);
             if (response.data.success) {
-                console.log("Invoice added");
                 setInvoice(formData);
                 navigate('/check');
             } else {
@@ -142,6 +136,9 @@ const InvoiceForm = () => {
             console.error("Error occurred while submitting:", error);
         }
     };
+    const handleWheel = (e) => {
+        e.target.blur();
+    };
 
     return (
         <>
@@ -149,7 +146,7 @@ const InvoiceForm = () => {
             <div className="max-w-3xl mx-auto p-6 bg-blue-50 rounded-lg shadow-lg mt-10">
                 <h1 className="text-4xl font-bold mb-6 text-gray-800 text-center">Invoice Form</h1>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Client Details Section */}
                         <div className="border p-4 rounded-lg bg-blue-100">
                             <h2 className="text-2xl font-semibold mb-4 text-gray-700">Client Details</h2>
@@ -160,7 +157,7 @@ const InvoiceForm = () => {
                                 onChange={handleClientChange}
                                 list="clientNames"
                                 placeholder="Client Name"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full mb-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                             <datalist id="clientNames">
@@ -174,7 +171,7 @@ const InvoiceForm = () => {
                                 value={clientDetails.address}
                                 onChange={handleClientChange}
                                 placeholder="Address"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full mb-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                             <input
@@ -183,7 +180,7 @@ const InvoiceForm = () => {
                                 value={clientDetails.phone}
                                 onChange={handleClientChange}
                                 placeholder="Phone"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full mb-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                             <input
@@ -192,7 +189,7 @@ const InvoiceForm = () => {
                                 value={clientDetails.gstNo}
                                 onChange={handleClientChange}
                                 placeholder="GST No"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full mb-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                             <input
@@ -213,7 +210,7 @@ const InvoiceForm = () => {
                                 value={invoiceNumber}
                                 onChange={(e) => setInvoiceNumber(e.target.value)}
                                 placeholder="Invoice Number"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full mb-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                             <input
@@ -230,7 +227,7 @@ const InvoiceForm = () => {
                     <div className="border p-4 rounded-lg bg-blue-100">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-700">Invoice Items</h2>
                         {invoiceItems.map((item, index) => (
-                            <div key={index} className="space-y-4">
+                            <div key={index} className="space-y-4 mb-6">
                                 <input
                                     type="text"
                                     name="description"
@@ -248,35 +245,26 @@ const InvoiceForm = () => {
                                     placeholder="Base Amount"
                                     className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required
+                                    onWheel={handleWheel}
                                 />
-                                {/* Display GST and Total Amount */}
-                                <input
-                                    type="text"
-                                    value={item.gstAmount.toFixed(2)} // Format for display
-                                    readOnly
-                                    placeholder="GST Amount"
-                                    className="w-full p-4 border border-gray-300 rounded-lg bg-gray-200"
-                                />
-                                <input
-                                    type="text"
-                                    value={item.totalAmount.toFixed(2)} // Format for display
-                                    readOnly
-                                    placeholder="Total Amount"
-                                    className="w-full p-4 border border-gray-300 rounded-lg bg-gray-200"
-                                />
+                                <div className="flex justify-between">
+                                    <p className="text-lg text-gray-700">GST Amount: ₹{item.gstAmount}</p>
+                                    <p className="text-lg text-gray-700">Total Amount: ₹{item.totalAmount}</p>
+                                </div>
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveItem(index)}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+                                    className="text-white w-[50%] font-semibold rounded-lg p-4 hover:bg-red-800 hover:underline bg-red-500"
                                 >
                                     Remove Item
                                 </button>
                             </div>
                         ))}
+
                         <button
                             type="button"
                             onClick={handleAddItem}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 mt-4"
+                            className="w-full p-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
                         >
                             Add Item
                         </button>
@@ -285,7 +273,7 @@ const InvoiceForm = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition duration-300"
+                        className="w-full p-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600"
                     >
                         Submit Invoice
                     </button>
