@@ -6,9 +6,9 @@ const Client = require("../models/clientModel")
 const clientSchema = zod.object({
     name: zod.string(),
     address: zod.string(),
-    phone: zod.string(),
+    phone: zod.string().optional(),
     gstNo: zod.string().length(15),
-    email: zod.string().email().optional(),
+    email: zod.string().optional(),
 })
 router.post('/add', async (req, res) => {
     try {

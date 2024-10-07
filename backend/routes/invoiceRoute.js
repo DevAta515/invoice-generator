@@ -16,18 +16,18 @@ const invoiceSchema = zod.object({
     invoiceNo: zod.string().startsWith("PT").length(8),
     name: zod.string(),
     address: zod.string(),
-    phone: zod.string(),
+    phone: zod.string().optional(),
     date: zod.string(),
     gstNo: zod.string().min(15),
-    email: zod.string().email().optional(),
+    email: zod.string().optional(),
     items: zod.array(itemSchema)
 });
 const clientSchema = zod.object({
     name: zod.string(),
     address: zod.string(),
-    phone: zod.string(),
+    phone: zod.string().optional(),
     gstNo: zod.string().length(15),
-    email: zod.string().email().optional(),
+    email: zod.string().optional(),
 })
 
 router.post("/add", async (req, res) => {

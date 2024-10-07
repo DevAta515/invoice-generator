@@ -112,7 +112,7 @@ const InvoiceForm = () => {
             invoiceNo: invoiceNumber,
             name: clientDetails.name,
             address: clientDetails.address,
-            phone: clientDetails.phone,
+            phone: clientDetails.phone || "",
             date: invoiceDate,
             items: invoiceItems.map(item => ({
                 description: item.description,
@@ -121,7 +121,7 @@ const InvoiceForm = () => {
                 baseAmount: item.baseAmount
             })),
             gstNo: clientDetails.gstNo,
-            email: clientDetails.email,
+            email: clientDetails.email || "",
         };
 
         try {
@@ -181,7 +181,6 @@ const InvoiceForm = () => {
                                 onChange={handleClientChange}
                                 placeholder="Phone"
                                 className="w-full mb-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
                             />
                             <input
                                 type="text"
