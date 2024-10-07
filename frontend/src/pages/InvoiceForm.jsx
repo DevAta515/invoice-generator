@@ -216,6 +216,7 @@ const InvoiceForm = () => {
                             <input
                                 type="date"
                                 value={invoiceDate} // Already set to today's date by default
+                                onChange={(e) => setInvoiceDate(e.target.value)}
                                 className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required// This disables the input, preventing any changes
                             />

@@ -34,7 +34,7 @@ const InvoicePage = () => {
 
             <div ref={contentRef} className="min-h-screen flex flex-col bg-white px-1 font-sans">
                 {/* Main Invoice Content */}
-                <div className="flex-grow relative z-10 w-[100%] h-[100%] bg-white p-10">
+                <div className="flex-grow relative z-10 w-[100%] h-[100%] bg-white p-4">
                     {/* Watermark */}
                     <div className="absolute inset-0 flex justify-center items-center opacity-[.1] pointer-events-none z-20 watermark">
                         <img
@@ -55,7 +55,7 @@ const InvoicePage = () => {
                     </div>
 
                     {/* Billed To and Billing Details */}
-                    <div className="flex justify-between space-x-12 mt-6">
+                    <div className="flex justify-between space-x-12">
                         <div className="w-1/2">
                             <h2 className="text-xl font-bold text-[#E85523] mb-2">BILLED TO</h2>
                             <p className="text-lg font-semibold text-orange-600">{invoice.name}</p>
@@ -74,13 +74,13 @@ const InvoicePage = () => {
                         </div>
                     </div>
 
-                    <div className="mt-6">
+                    <div className="mt-3">
                         <p className="text-lg font-bold text-[#E85523]">DATE: {invoice.date}</p>
                         <p className="text-2xl text-gray-600">INVOICE#  {invoice.invoiceNo}</p>
                     </div>
 
                     {/* Invoice Description Table */}
-                    <div className="mt-3">
+                    <div className="">
                         <div className="border-t-4 border-[#E85523]">
                             <table className="w-full mt-4 text-left">
                                 <thead>
@@ -123,11 +123,11 @@ const InvoicePage = () => {
                 </div>
 
                 {/* Footer always at the bottom */}
-                <div className="footer mt-6 pb-3 pl-4">
-                    <p className="text-lg font-semibold text-gray-700 mb-2">Have Questions?</p>
+                <div className="footer mt-1 pb-3 pl-4">
+                    <p className="text-lg font-semibold text-gray-700 ">Have Questions?</p>
                     <p className="text-gray-600">Call us: 8587 888 326</p>
                     <p className="text-gray-600">Mail us: phoenixtechnosoftindia@gmail.com</p>
-                    <p className="italic text-sm text-gray-500 mt-6">
+                    <p className="italic text-sm text-gray-500 mt-1">
                         This package is prepared by Phoenix Technosoft Pvt. Ltd.<br />
                         For any discrepancy, kindly connect within 24 hours from the date of generation.
                     </p>
